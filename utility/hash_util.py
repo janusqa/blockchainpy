@@ -1,6 +1,5 @@
 import hashlib
 import json
-from typing import Hashable
 
 
 def hash_block(block):

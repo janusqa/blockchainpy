@@ -1,12 +1,13 @@
 from functools import reduce
 import json
 import pickle
-from typing import List
 
-from hash_util import hash_block
+from utility.hash_util import hash_block
+from utility.verification import Verification
 from block import Block
 from transaction import Transaction
-from verification import Verification
+from wallet import Wallet
+
 
 owner = "Max"
 participants = set(["Max"])
@@ -69,7 +70,9 @@ class Blockchain:
                     block["index"],
                     block["previous_hash"],
                     [
-                        Transaction(tx["sender"], tx["recipient"], tx["amount"])
+                        Transaction(
+                            tx["signature"], tx["recipient"], tx["sender"], tx["amount"]
+                        )
                         for tx in block["transactions"]
                     ],
                     block["proof"],
@@ -79,7 +82,10 @@ class Blockchain:
             self.blockchain = updated_blockchain  # using setter here
             ot = json.loads(file_content[1])
             self.open_transactions = [
-                Transaction(tx["sender"], tx["recipient"], tx["amount"]) for tx in ot
+                Transaction(
+                    tx["signature"], tx["recipient"], tx["sender"], tx["amount"]
+                )
+                for tx in ot
             ]  # using setter
 
     def proof_of_work(self):
@@ -129,24 +135,28 @@ class Blockchain:
             return self.__blockchain[-1]
         return None
 
-    def add_transaction(self, recipient, sender, amount=1.0):
-        transaction = Transaction(sender, recipient, amount)
-        if Verification.verify_transaction(transaction, self.get_balance):
-            self.__open_transactions.append(transaction)
-            self.save_data()
-            return True
-        return False
+    def add_transaction(self, signature, recipient, sender, amount=1.0):
+        transaction = Transaction(signature, recipient, sender, amount)
+        if not Verification.verify_transaction(transaction, self.get_balance):
+            return False
+        self.__open_transactions.append(transaction)
+        self.save_data()
+        return True
 
     def mine_block(self):
         hashed_block = hash_block(self.get_last_blockchain_value())
         # print(hashed_block)
         proof = self.proof_of_work()
-        reward_transaction = Transaction("MINING", self.node, MINING_REWARD)
+        reward_transaction = Transaction("", self.node, "MINING", MINING_REWARD)
         copied_transactions = self.open_transactions  # using getter to return a copy
+        for tx in copied_transactions:
+            if not Wallet.verify_transaction(tx):
+                return None
         copied_transactions.append(reward_transaction)
         block = Block(len(self.__blockchain), hashed_block, copied_transactions, proof)
         self.__blockchain.append(block)
         self.open_transactions = []  # using setter
-        if Verification.verify_chain(self.__blockchain):
-            self.save_data()
-        return True
+        if not Verification.verify_chain(self.__blockchain):
+            return None
+        self.save_data()
+        return block

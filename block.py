@@ -1,6 +1,6 @@
 from time import time
 from collections import OrderedDict
-from printable import Printable
+from utility.printable import Printable
 from transaction import Transaction
 from typing import List
 
