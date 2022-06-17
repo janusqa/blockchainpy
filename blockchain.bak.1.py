@@ -2,6 +2,7 @@ from functools import reduce
 from collections import OrderedDict
 import json
 import pickle
+import copy
 
 from hash_util import hash_string_256, hash_block
 from block import Block
@@ -208,7 +209,7 @@ def mine_block():
     #     ]
     # )
     reward_transaction = Transaction("MINING", owner, MINING_REWARD)
-    copied_transactions = open_transactions[:]
+    copied_transactions = copy.deepcopy(open_transactions)
     copied_transactions.append(reward_transaction)
     # we use sort_keys when dumping blocks to json but
     # what the hey, lets use orderddict here as well

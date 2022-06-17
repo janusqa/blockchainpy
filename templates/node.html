@@ -7,6 +7,21 @@
                 <h1>Manage your Blockchain</h1>
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"
+                            >Wallet &amp; Node</a
+                        >
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/network">Network</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr />
         <div
             v-if="error"
             v-html="error"
@@ -133,6 +148,13 @@
                 >
                     Mine Coins
                 </button>
+                <button
+                    v-if="view === 'chain' && wallet"
+                    class="btn btn-warning"
+                    @click="onResolve"
+                >
+                    Resolve Conflicts
+                </button>
             </div>
         </div>
         <div class="row">
@@ -214,5 +236,5 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bt_node.js') }}"></script>
 {% endblock content %}

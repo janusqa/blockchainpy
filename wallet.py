@@ -6,14 +6,15 @@ import binascii
 
 
 class Wallet:
-    def __init__(self):
+    def __init__(self, port):
         self.private_key = None
         self.public_key = None
+        self.node_port = port
 
     def create_keys(self):
         self.private_key, self.public_key = self.generate_keys()
         try:
-            with open("./wallet.txt", mode="w") as f:
+            with open(f"./wallet_{self.node_port}.txt", mode="w") as f:
                 f.write(self.public_key)
                 f.write("\n")
                 f.write(self.private_key)
@@ -25,7 +26,7 @@ class Wallet:
 
     def load_keys(self):
         try:
-            with open("./wallet.txt", mode="r") as f:
+            with open(f"./wallet_{self.node_port}.txt", mode="r") as f:
                 file_content = f.readlines()
             self.public_key = file_content[0][:-1]
         except (FileNotFoundError, IndexError):

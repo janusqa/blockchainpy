@@ -36,17 +36,7 @@ const app = new Vue({
                 .get('/wallet')
                 .then(function (response) {
                     vm.error = null;
-                    vm.success = `Wallet ready.<br>Public Key: ${response.data.response.public_key.slice(
-                        0,
-                        10
-                    )}...${response.data.response.public_key.slice(
-                        response.data.response.public_key.length - 10
-                    )}<br>Private Key: ${response.data.response.private_key.slice(
-                        0,
-                        10
-                    )}...${response.data.response.private_key.slice(
-                        response.data.response.private_key.length - 10
-                    )}`;
+                    vm.success = `Wallet ready.<hr>Public Key: ${response.data.response.public_key}<hr>Private Key: ${response.data.response.private_key}`;
                     vm.wallet = {
                         public_key: response.data.response.public_key,
                         private_key: response.data.response.private_key,
@@ -95,6 +85,19 @@ const app = new Vue({
                     vm.error = null;
                     vm.success = response.data.response.message;
                     vm.funds = response.data.response.balance;
+                })
+                .catch(function (error) {
+                    vm.success = null;
+                    vm.error = error.response.data.response.message;
+                });
+        },
+        onResolve: function () {
+            const vm = this;
+            axios
+                .patch('/resolve-conflicts')
+                .then(function (response) {
+                    vm.error = null;
+                    vm.success = response.data.response.message;
                 })
                 .catch(function (error) {
                     vm.success = null;
